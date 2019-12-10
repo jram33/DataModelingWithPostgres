@@ -36,8 +36,8 @@ songplay_table_insert = ("""
 user_table_insert = ("""
 """)
 
-song_table_insert = ("""
-""")
+song_table_insert = ("""INSERT INTO songs (song_id, title, artist_id, year, duration)
+                        VALUES (%s, %s, %s, %s, %s) ON CONFLICT (song_id, artist_id) DO NOTHING;""")
 
 artist_table_insert = ("""
 """)
