@@ -33,8 +33,8 @@ time_table_create = ("""CREATE TABLE IF NOT EXISTS time (start_time timestamp PR
 songplay_table_insert = ("""
 """)
 
-user_table_insert = ("""
-""")
+user_table_insert = ("""INSERT INTO users (user_id, first_name, last_name, gender, level)
+                        VALUES (%s, %s, %s, %s, %s) ON CONFLICT (user_id) DO NOTHING;""")
 
 song_table_insert = ("""INSERT INTO songs (song_id, title, artist_id, year, duration)
                         VALUES (%s, %s, %s, %s, %s) ON CONFLICT (song_id, artist_id) DO NOTHING;""")
