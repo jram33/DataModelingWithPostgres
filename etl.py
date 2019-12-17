@@ -6,8 +6,21 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
+    """
+    Description: 
+        Used to read the file in the filepath (data/song_data)
+        and populate the songs and artists dim tables.
+
+    Args:
+        cur: the cursor object. 
+        filepath: song data file path. 
+
+    Returns:
+        None
+    
+    """
     # open song file
-    df = pd.read_json(filepath, lines = True) 
+    df = pd.read_json(filepath, lines = True)
 
     # insert song record
     song_data = df[["song_id", "title", "artist_id", "year", "duration"]].values[0]
@@ -20,14 +33,28 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
+    """
+    Description: 
+        Used to read the file in the filepath (data/log_data)
+        and populate the users and time dim tables, as well as 
+        the songplays fact table.
+
+    Args:
+        cur: the cursor object. 
+        filepath: log data file path. 
+
+    Returns:
+        None
+    
+    """
     # open log file
-    df = pd.read_json(filepath, lines = True) 
+    df = pd.read_json(filepath, lines = True)
 
     # filter by NextSong action
-    df = df[df.page == "NextSong"] 
+    df = df[df.page == "NextSong"]
 
     # convert timestamp column to datetime
-    t = pd.to_datetime(df.ts, unit = "ms") 
+    t = pd.to_datetime(df.ts, unit = "ms")
     
     # insert time data records
     time_data = [t, t.dt.hour, t.dt.day, t.dt.weekofyear, t.dt.month, t.dt.year, t.dt.weekday]
@@ -35,10 +62,10 @@ def process_log_file(cur, filepath):
     time_df = pd.DataFrame.from_dict(dict(zip(column_labels, time_data)))
 
     for i, row in time_df.iterrows():
-        cur.execute(time_table_insert, list(row))
+        cur.execute(time_table_insert, row)
 
     # load user table
-    user_df = df[["userId", "firstName", "lastName", "gender", "level"]] 
+    user_df = df[["userId", "firstName", "lastName", "gender", "level"]]
 
     # insert user records
     for i, row in user_df.iterrows():
@@ -63,6 +90,20 @@ def process_log_file(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
+    """
+    Description: 
+        Fetch and process each file path in the filepath directory. 
+
+    Args:
+        cur: the cursor object.
+        conn: the database connection object.
+        filepath: data file path.
+        func: function to apply.
+
+    Returns:
+        None
+
+    """ 
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
